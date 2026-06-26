@@ -7,28 +7,71 @@
     - default.config.yml
 
   tasks:
-    - name: Install Homebrew packages
-      when: ansible_os_family == "Darwin"
-      community.general.homebrew:
-        name: "{{ homebrew_packages }}"
-        state: present
-        update_homebrew: true
-      tags:
-        - homebrew
+    # The whole play is macOS-only. setup.sh and the Makefile already refuse to
+    # run off Darwin, so the OS guard lives once here (block-level) rather than
+    # being restamped on every task.
+    - name: Configure macOS
+      when: ansible_facts['os_family'] == "Darwin"
+      block:
+        - name: Install Homebrew packages
+          community.general.homebrew:
+            name: "{{ homebrew_packages }}"
+            state: present
+            update_homebrew: true
+          tags:
+            - homebrew
 
-    - name: Install Homebrew casks
-      when: ansible_os_family == "Darwin"
-      community.general.homebrew_cask:
-        name: "{{ homebrew_casks }}"
-        state: present
-      tags:
-        - homebrew_casks
+        - name: Install Homebrew casks
+          community.general.homebrew_cask:
+            name: "{{ homebrew_casks }}"
+            state: present
+          tags:
+            - homebrew_casks
 
-    - name: Stow dotfiles
-      ansible.builtin.command:
-        cmd: "{{ brew_prefix }}/bin/stow --no-folding --override='.*' -d {{ dotfiles_dir }} -t {{ ansible_env.HOME }} {{ item }}"
-      loop: "{{ dotfile_packages }}"
-      register: stow_result
-      changed_when: stow_result.rc == 0
-      tags:
-        - dotfiles
+        - name: Stow dotfiles
+          ansible.builtin.command:
+            cmd: "{{ brew_prefix }}/bin/stow --no-folding --override='.*' -d {{ dotfiles_dir }} -t {{ ansible_env.HOME }} {{ item }}"
+          loop: "{{ dotfile_packages }}"
+          register: stow_result
+          changed_when: stow_result.rc == 0
+          tags:
+            - dotfiles
+
+        # Mac App Store runs last and never blocks the essential setup above:
+        # `mas` cannot install unless signed into the App Store, and that sign-in
+        # cannot be automated. If not signed in, we prompt + warn instead of failing.
+        - name: Check Mac App Store sign-in status
+          ansible.builtin.command: mas account
+          register: mas_account
+          changed_when: false
+          failed_when: false
+          tags:
+            - mas
+
+        - name: Install Mac App Store apps
+          when: mas_account.rc == 0
+          community.general.mas:
+            id: "{{ item.id }}"
+            state: present
+          loop: "{{ mac_app_store_apps }}"
+          loop_control:
+            label: "{{ item.name }}"
+          tags:
+            - mas
+
+        - name: Prompt sign-in when not signed into the Mac App Store
+          when: mas_account.rc != 0
+          tags:
+            - mas
+          block:
+            - name: Open the App Store (sign-in cannot be automated past 2FA)
+              ansible.builtin.command: open -a "App Store"
+              changed_when: false
+              failed_when: false
+
+            - name: Warn that App Store apps were skipped
+              ansible.builtin.debug:
+                msg: >-
+                  Not signed into the App Store; skipped {{ mac_app_store_apps | length }} app(s).
+                  Opened the App Store app for you — sign in (with 2FA), then re-run:
+                  ansible-playbook --tags mas main.yml

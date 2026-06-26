@@ -34,12 +34,23 @@ else
     echo "Command Line Tools already installed."
 fi
 
-# Clone or update repository (always sync to upstream)
+# Clone or update repository.
+# Default is a non-destructive fast-forward. Set WHOTHIS_FORCE=1 to discard
+# local changes (including untracked files) and hard-reset to upstream.
 if [ -d "$INSTALL_DIR" ]; then
-    echo "Resetting to upstream..."
     git -C "$INSTALL_DIR" fetch origin
-    git -C "$INSTALL_DIR" reset --hard origin/main
-    git -C "$INSTALL_DIR" clean -fd
+    if [ "${WHOTHIS_FORCE:-0}" = "1" ]; then
+        echo "WHOTHIS_FORCE=1: discarding local changes and resetting to origin/main..."
+        git -C "$INSTALL_DIR" reset --hard origin/main
+        git -C "$INSTALL_DIR" clean -fd
+    else
+        echo "Updating (fast-forward only)..."
+        if ! git -C "$INSTALL_DIR" merge --ff-only origin/main; then
+            echo "error: local changes block a fast-forward update."
+            echo "Commit or stash them, or re-run with WHOTHIS_FORCE=1 to discard local changes."
+            exit 1
+        fi
+    fi
 else
     echo "Cloning whothis..."
     git clone "$REPO_URL" "$INSTALL_DIR"

@@ -1,3 +1,7 @@
 ---
+# Installed by `make playbook` via:
+#   ansible-galaxy collection install -r requirements.yml
+# This is the authoritative source for Ansible collections; pin versions here.
 collections:
   - name: community.general
+    version: ">=8.0.0"

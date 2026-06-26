@@ -1,5 +1,7 @@
 ---
 
+# arch -> brew prefix. NOTE: this logic is intentionally mirrored across three
+# runtimes (make/jinja/zsh): Makefile, here, and dotfiles/zsh/.zsh/.zprofile.
 brew_prefix: "{{ '/opt/homebrew' if ansible_architecture == 'arm64' else '/usr/local' }}"
 
 dotfiles_dir: "{{ playbook_dir }}/../dotfiles"
@@ -10,6 +12,7 @@ dotfile_packages:
   - git
   - ssh
   - vim
+  - wezterm
   - zsh
 
 homebrew_packages:
@@ -20,7 +23,8 @@ homebrew_packages:
   - git
   - localstack
   - mas  # Mac Apple Store CLI
-  - protonpass/tap/pass-cli
+  - proton-pass-cli
+  - sdkman/tap/sdkman-cli  # Java version manager (auto-taps sdkman/tap)
   - starship
   - stow
   - vim
@@ -31,7 +35,6 @@ homebrew_casks:
   - claude-code
   - chromium
   - firefox@developer-edition
-  - iterm2
   - jetbrains-toolbox
   - keepassxc  # provides keepassxc-cli
   - obsidian  # text editor
@@ -40,4 +43,12 @@ homebrew_casks:
   - protonvpn
   - rectangle  # tiling window manager
   - virtualbox
+  - wezterm  # terminal (config shipped in dotfiles/wezterm)
   - yubico-authenticator  # security key TOTP
+
+# Mac App Store apps, installed via `mas` (requires being signed into the App Store).
+mac_app_store_apps:
+  - { id: 497799835, name: Xcode }
+  - { id: 409183694, name: Keynote }
+  - { id: 409203825, name: Numbers }
+  - { id: 409201541, name: Pages }

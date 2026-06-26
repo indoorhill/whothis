@@ -29,25 +29,17 @@ The setup script will:
 
 ## What Gets Installed
 
-### Development Tools
-- git, vim, stow
-- Docker (via Colima)
-- LocalStack
-- act (GitHub Actions local testing)
+The full, authoritative list lives in
+[`ansible/default.config.yml`](ansible/default.config.yml). Edit that file to
+change what gets installed; it is not duplicated here because the list used to
+drift. The three install lanes are:
 
-### Applications
-- **AI Tooling**: Claude, Claude Code
-- **Browsers**: Chromium, Firefox Developer Edition
-- **IDEs**: JetBrains Toolbox
-- **Productivity**: Obsidian, Proton Drive
-- **Security**: KeePassXC, ProtonPass, ProtonVPN, Yubico Authenticator
-- **Terminal**: iTerm2
-- **Utilities**: Rectangle (window tiling)
-
-### Mac App Store
-- Xcode
-- Strongbox (password manager)
-- iWork Suite (Keynote, Numbers, Pages)
+- `homebrew_packages`: CLI tools (git, vim, stow, Docker via Colima, LocalStack,
+  act, SDKMAN for Java, and more)
+- `homebrew_casks`: GUI apps (Claude, Claude Code, Chromium, Firefox Developer
+  Edition, JetBrains Toolbox, Obsidian, WezTerm, Proton suite, KeePassXC,
+  Yubico Authenticator, Rectangle, and more)
+- `mac_app_store_apps`: App Store apps via `mas` (Xcode, Keynote, Numbers, Pages)
 
 ## Project Structure
 
@@ -61,9 +53,11 @@ whothis/
 ├── dotfiles/                # Stow-managed configuration files
 │   ├── cache/               # dumping ground for various programs' temp files
 │   ├── claude/              # Claude Code settings
+│   ├── config/              # XDG ~/.config files (e.g. gh)
 │   ├── git/                 # Git configuration
 │   ├── ssh/                 # SSH configuration
 │   ├── vim/                 # Vim configuration
+│   ├── wezterm/             # WezTerm terminal configuration
 │   └── zsh/                 # zsh configuration 
 ├── Makefile                 # Build orchestration
 ├── setup.sh                 # Bootstrap script
@@ -96,6 +90,19 @@ make playbook             # Run the Ansible playbook
 Edit `ansible/default.config.yml` to customize:
 - `homebrew_packages` - CLI tools to install
 - `homebrew_casks` - GUI applications to install
+- `mac_app_store_apps` - App Store apps to install via `mas`
+
+## Manual Steps
+
+A few things can't be automated and need doing once after the first run:
+
+- **Mac App Store**: sign in to the App Store app before `mas` can install
+  anything. The playbook prompts and warns rather than failing if you aren't
+  signed in.
+- **JetBrains Toolbox shell launchers**: open Toolbox, turn on *Generate shell
+  scripts* in Settings, and set the scripts location to `~/.local/bin` (already
+  on `PATH` via `.zprofile`). IDEs are then launchable from the terminal. The
+  per-IDE launcher names are editable in each tool's settings.
 
 ## Requirements
 

@@ -1,9 +1,92 @@
 {
   "env": {
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+    "DISABLE_TELEMETRY": "1",
+    "DISABLE_ERROR_REPORTING": "1",
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
+    "DISABLE_AUTOUPDATER": "1"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
   },
   "permissions": {
+    "allow": [
+      "WebSearch",
+      "Read",
+      "Glob",
+      "Grep",
+      "WebFetch(domain:arxiv.org)",
+      "WebFetch(domain:link.springer.com)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:deepwiki.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:docs.rs)",
+      "WebFetch(domain:docling-project.github.io)",
+      "Bash(awk:*)",
+      "Bash(gh:*)",
+      "Bash(git:*)",
+      "Bash(make -n:*)",
+      "Bash(say:*)",
+      "Bash(shasum:*)",
+      "Bash(tee:*)",
+      "Bash(uv:*)",
+      "Bash(.venv/bin/python:*)",
+      "Bash(.venv/bin/python3:*)"
+    ],
+    "deny": [
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(pip:*)",
+      "Bash(/usr/bin/python3:*)",
+      "Bash(/usr/bin/python:*)",
+      "Bash(/usr/bin/pip:*)",
+      "Bash(/usr/bin/pip3:*)",
+      "Bash(/usr/local/bin/python3:*)",
+      "Bash(/usr/local/bin/python:*)",
+      "Bash(/usr/local/bin/pip:*)",
+      "Bash(/usr/local/bin/pip3:*)",
+      "Bash(/opt/homebrew/bin/python3:*)"
+    ],
+    "ask": [],
     "defaultMode": "default"
   },
-  "alwaysThinkingEnabled": true
+  "model": "claude-opus-4-8",
+  "hooks": {},
+  "worktree": {
+    "baseRef": "head"
+  },
+  "workflowKeywordTriggerEnabled": false,
+  "statusLine": {
+    "type": "command",
+    "command": "bash /Users/ethan/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "code-simplifier@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "serena@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "understand-anything@understand-anything": true
+  },
+  "extraKnownMarketplaces": {
+    "understand-anything": {
+      "source": {
+        "source": "github",
+        "repo": "Egonex-AI/Understand-Anything"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "promptSuggestionEnabled": false,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "editorMode": "vim",
+  "voiceEnabled": true
 }

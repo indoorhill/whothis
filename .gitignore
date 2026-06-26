@@ -9,3 +9,7 @@ CLAUDE.md
 *.swp
 .idea/
 vim/undodir/*
+
+# macos
+.DS_Store
+
